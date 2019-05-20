@@ -8,6 +8,11 @@
 
 A powerful whatsapp plugin for Flutter.
 
+## docs
+
+* [Android](https://faq.whatsapp.com/en/android/28000012?lang=zh_cn)
+* [iOS](https://faq.whatsapp.com/iphone/23559013)
+
 ## android
 
 ````
