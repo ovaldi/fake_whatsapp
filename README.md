@@ -8,6 +8,34 @@
 
 A powerful whatsapp plugin for Flutter.
 
+## android
+
+````
+# 不需要做任何额外接入工作
+````
+
+## ios
+
+````
+iOS 9系统策略更新，限制了http协议的访问，此外应用需要在“Info.plist”中将要使用的URL Schemes列为白名单，才可正常检查其他应用是否安装。
+
+<key>LSApplicationQueriesSchemes</key>
+<array>
+    <string>whatsapp</string>
+</array>
+<key>NSAppTransportSecurity</key>
+<dict>
+    <key>NSAllowsArbitraryLoads</key>
+    <true/>
+</dict>
+````
+
+## flutter
+
+* snapshot
+
+* release
+
 ## Getting Started
 
 This project is a starting point for a Flutter
