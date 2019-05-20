@@ -83,10 +83,8 @@ public class FakeWhatsappPlugin implements MethodCallHandler {
         sendIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(imageUri));
         sendIntent.setType("image/*");
         if (resolveIntent(registrar.context(), sendIntent, WHATSAPP_PACKAGE_NAME)) {
-            if (URLUtil.isFileUrl(imageUri)) {
-                registrar.context().grantUriPermission(WHATSAPP_PACKAGE_NAME, Uri.parse(imageUri), Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            }
+            registrar.context().grantUriPermission(WHATSAPP_PACKAGE_NAME, Uri.parse(imageUri), Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             sendIntent.setPackage(WHATSAPP_PACKAGE_NAME);
             registrar.activity().startActivity(sendIntent);
         }
@@ -98,7 +96,7 @@ public class FakeWhatsappPlugin implements MethodCallHandler {
         String webpageUrl = call.argument(ARGUMENT_KEY_WEBPAGEURL);
         Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
-        sendIntent.putExtra(Intent.EXTRA_TEXT, text + webpageUrl);
+        sendIntent.putExtra(Intent.EXTRA_TEXT, !TextUtils.isEmpty(text) ? text + webpageUrl : webpageUrl);
         sendIntent.setType("text/*");
         if (resolveIntent(registrar.context(), sendIntent, WHATSAPP_PACKAGE_NAME)) {
             sendIntent.setPackage(WHATSAPP_PACKAGE_NAME);

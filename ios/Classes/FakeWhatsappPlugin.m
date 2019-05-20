@@ -67,7 +67,12 @@ static NSString * const ARGUMENT_KEY_WEBPAGEURL = @"webpageUrl";
     webpageUrl = [webpageUrl stringByReplacingOccurrencesOfString:@"," withString:@"%2C"];
     webpageUrl = [webpageUrl stringByReplacingOccurrencesOfString:@"=" withString:@"%3D"];
     webpageUrl = [webpageUrl stringByReplacingOccurrencesOfString:@"&" withString:@"%26"];
-    NSURL * whatsappURL = [NSURL URLWithString:[NSString stringWithFormat:@"whatsapp://send?text=%@%@", [text stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]], [webpageUrl stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]]]];
+    NSURL * whatsappURL = nil;
+    if (text != nil && [text length] > 0) {
+        whatsappURL = [NSURL URLWithString:[NSString stringWithFormat:@"whatsapp://send?text=%@%@", [text stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]], webpageUrl]];
+    } else {
+        whatsappURL = [NSURL URLWithString:[NSString stringWithFormat:@"whatsapp://send?text=%@", webpageUrl]];
+    }
     if ([[UIApplication sharedApplication] canOpenURL: whatsappURL]) {
         [[UIApplication sharedApplication] openURL: whatsappURL];
     }

@@ -13,6 +13,8 @@ class Whatsapp {
   static const String _ARGUMENT_KEY_IMAGEURI = 'imageUri';
   static const String _ARGUMENT_KEY_WEBPAGEURL = 'webpageUrl';
 
+  static const String _SCHEME_FILE = 'file';
+
   final MethodChannel _channel =
       const MethodChannel('v7lin.github.io/fake_whatsapp');
 
@@ -25,6 +27,7 @@ class Whatsapp {
   Future<void> shareText({
     @required String text,
   }) {
+    assert(text != null && text.isNotEmpty);
     return _channel.invokeMethod(
       _METHOD_SHARETEXT,
       <String, dynamic>{
@@ -35,15 +38,32 @@ class Whatsapp {
 
   /// 分享 - 图片
   Future<void> shareImage({
-    String title,
-    String description,
     @required Uri imageUri,
-  }) {}
+  }) {
+    assert(imageUri != null && imageUri.isScheme(_SCHEME_FILE));
+    return _channel.invokeMethod(
+      _METHOD_SHAREIMAGE,
+      <String, dynamic>{
+        _ARGUMENT_KEY_IMAGEURI: imageUri.toString(),
+      },
+    );
+  }
 
   /// 分享 - 网页
   Future<void> shareWebpage({
-    String title,
-    String description,
+    String text,
     @required String webpageUrl,
-  }) {}
+  }) {
+    assert(webpageUrl != null && webpageUrl.isNotEmpty);
+    Map<String, dynamic> map = <String, dynamic>{
+//      _ARGUMENT_KEY_TEXT: text,
+      _ARGUMENT_KEY_WEBPAGEURL: webpageUrl,
+    };
+
+    /// 兼容 iOS 空安全 -> NSNull
+    if (text != null && text.isNotEmpty) {
+      map.putIfAbsent(_ARGUMENT_KEY_TEXT, () => text);
+    }
+    return _channel.invokeMethod(_METHOD_SHAREWEBPAGE, map);
+  }
 }
