@@ -1,15 +1,21 @@
 package io.github.v7lin.fakewhatsapp;
 
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ProviderInfo;
 import android.content.pm.ResolveInfo;
 import android.net.Uri;
+import android.os.Build;
+import android.provider.MediaStore;
 import android.text.TextUtils;
-import android.webkit.URLUtil;
 
-import java.net.URL;
+import androidx.core.content.FileProvider;
+
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.List;
 
 import io.flutter.plugin.common.MethodCall;
@@ -17,6 +23,7 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
+import io.github.v7lin.fakewhatsapp.content.FakeWhatsappFileProvider;
 
 /**
  * FakeWhatsappPlugin
@@ -78,13 +85,20 @@ public class FakeWhatsappPlugin implements MethodCallHandler {
 
     private void shareImage(MethodCall call, Result result) {
         String imageUri = call.argument(ARGUMENT_KEY_IMAGEURI);
+        Uri imageUrl = Uri.parse(imageUri);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            try {
+                ProviderInfo providerInfo = registrar.context().getPackageManager().getProviderInfo(new ComponentName(registrar.context(), FakeWhatsappFileProvider.class), PackageManager.MATCH_DEFAULT_ONLY);
+                imageUrl = FileProvider.getUriForFile(registrar.context(), providerInfo.authority, new File(imageUrl.getPath()));
+            } catch (PackageManager.NameNotFoundException e) {
+            }
+        }
         Intent sendIntent = new Intent();
         sendIntent.setAction(Intent.ACTION_SEND);
-        sendIntent.putExtra(Intent.EXTRA_STREAM, Uri.parse(imageUri));
+        sendIntent.putExtra(Intent.EXTRA_STREAM, imageUrl);
         sendIntent.setType("image/*");
+        sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
         if (resolveIntent(registrar.context(), sendIntent, WHATSAPP_PACKAGE_NAME)) {
-            registrar.context().grantUriPermission(WHATSAPP_PACKAGE_NAME, Uri.parse(imageUri), Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
             sendIntent.setPackage(WHATSAPP_PACKAGE_NAME);
             registrar.activity().startActivity(sendIntent);
         }

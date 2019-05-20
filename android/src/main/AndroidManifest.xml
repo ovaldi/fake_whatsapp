@@ -1,3 +1,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-  package="io.github.v7lin.fakewhatsapp">
+    package="io.github.v7lin.fakewhatsapp">
+
+    <application>
+        <provider
+            android:name=".content.FakeWhatsappFileProvider"
+            android:authorities="${applicationId}.content.FakeWhatsappFileProvider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/fake_whatsapp_file_paths" />
+        </provider>
+    </application>
 </manifest>
