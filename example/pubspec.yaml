@@ -16,12 +16,14 @@ dependencies:
   path: ^1.6.2
   fake_path_provider: ^0.0.1+1
 
+  fake_whatsapp:
+    path: ../
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
-  fake_whatsapp:
-    path: ../
+  pedantic: '>=1.4.0 <3.0.0'
 
 # For information on the generic Dart part of this file, see the
 # following page: https://www.dartlang.org/tools/pub/pubspec

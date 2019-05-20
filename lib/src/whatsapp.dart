@@ -18,7 +18,7 @@ class Whatsapp {
   final MethodChannel _channel =
       const MethodChannel('v7lin.github.io/fake_whatsapp');
 
-  /// 检测微信是否已安装
+  /// 检测Whatsapp是否已安装
   Future<bool> isWhatsappInstalled() async {
     return (await _channel.invokeMethod(_METHOD_ISWHATSAPPINSTALLED)) as bool;
   }
