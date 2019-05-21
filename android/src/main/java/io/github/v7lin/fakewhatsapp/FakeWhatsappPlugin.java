@@ -39,11 +39,9 @@ public class FakeWhatsappPlugin implements MethodCallHandler {
     private static final String METHOD_ISWHATSAPPINSTALLED = "isWhatsappInstalled";
     private static final String METHOD_SHARETEXT = "shareText";
     private static final String METHOD_SHAREIMAGE = "shareImage";
-    private static final String METHOD_SHAREWEBPAGE = "shareWebpage";
 
     private static final String ARGUMENT_KEY_TEXT = "text";
     private static final String ARGUMENT_KEY_IMAGEURI = "imageUri";
-    private static final String ARGUMENT_KEY_WEBPAGEURL = "webpageUrl";
 
     private final Registrar registrar;
 
@@ -59,8 +57,6 @@ public class FakeWhatsappPlugin implements MethodCallHandler {
             shareText(call, result);
         } else if (TextUtils.equals(METHOD_SHAREIMAGE, call.method)) {
             shareImage(call, result);
-        } else if (TextUtils.equals(METHOD_SHAREWEBPAGE, call.method)) {
-            shareWebpage(call, result);
         } else {
             result.notImplemented();
         }
@@ -94,20 +90,6 @@ public class FakeWhatsappPlugin implements MethodCallHandler {
         sendIntent.putExtra(Intent.EXTRA_STREAM, imageUrl);
         sendIntent.setType("image/*");
         sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        sendIntent.setPackage(WHATSAPP_PACKAGE_NAME);
-        if (sendIntent.resolveActivity(registrar.context().getPackageManager()) != null) {
-            registrar.activity().startActivity(sendIntent);
-        }
-        result.success(null);
-    }
-
-    private void shareWebpage(MethodCall call, Result result) {
-        String text = call.argument(ARGUMENT_KEY_TEXT);
-        String webpageUrl = call.argument(ARGUMENT_KEY_WEBPAGEURL);
-        Intent sendIntent = new Intent();
-        sendIntent.setAction(Intent.ACTION_SEND);
-        sendIntent.putExtra(Intent.EXTRA_TEXT, !TextUtils.isEmpty(text) ? text + webpageUrl : webpageUrl);
-        sendIntent.setType("text/*");
         sendIntent.setPackage(WHATSAPP_PACKAGE_NAME);
         if (sendIntent.resolveActivity(registrar.context().getPackageManager()) != null) {
             registrar.activity().startActivity(sendIntent);

@@ -88,9 +88,8 @@ class _HomeState extends State<Home> {
           ListTile(
             title: const Text('网页分享'),
             onTap: () {
-              _whatsapp.shareWebpage(
-                text: '分享链接：',
-                webpageUrl: 'https://www.baidu.com/',
+              _whatsapp.shareText(
+                text: '分享链接：https://www.baidu.com/',
               );
             },
           ),
