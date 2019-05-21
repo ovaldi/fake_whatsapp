@@ -12,11 +12,9 @@
 static NSString * const METHOD_ISWHATSAPPINSTALLED = @"isWhatsappInstalled";
 static NSString * const METHOD_SHARETEXT = @"shareText";
 static NSString * const METHOD_SHAREIMAGE = @"shareImage";
-static NSString * const METHOD_SHAREWEBPAGE = @"shareWebpage";
 
 static NSString * const ARGUMENT_KEY_TEXT = @"text";
 static NSString * const ARGUMENT_KEY_IMAGEURI = @"imageUri";
-static NSString * const ARGUMENT_KEY_WEBPAGEURL = @"webpageUrl";
 
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
     if ([METHOD_ISWHATSAPPINSTALLED isEqualToString:call.method]) {
@@ -25,8 +23,6 @@ static NSString * const ARGUMENT_KEY_WEBPAGEURL = @"webpageUrl";
         [self shareText:call result:result];
     } else if ([METHOD_SHAREIMAGE isEqualToString:call.method]) {
         [self shareImage:call result:result];
-    } else if ([METHOD_SHAREWEBPAGE isEqualToString:call.method]) {
-        [self shareWebpage:call result:result];
     } else {
         result(FlutterMethodNotImplemented);
     }
@@ -34,7 +30,8 @@ static NSString * const ARGUMENT_KEY_WEBPAGEURL = @"webpageUrl";
 
 - (void) shareText:(FlutterMethodCall*)call result:(FlutterResult)result {
     NSString * text = call.arguments[ARGUMENT_KEY_TEXT];
-    NSURL * whatsappURL = [NSURL URLWithString:[NSString stringWithFormat:@"whatsapp://send?text=%@", [text stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]]]];
+    text = (NSString *)CFBridgingRelease(CFURLCreateStringByAddingPercentEscapes(NULL, (CFStringRef)text, NULL, (CFStringRef)@"!*'();:@&=+$,/?%#[]", kCFStringEncodingUTF8));
+    NSURL * whatsappURL = [NSURL URLWithString:[NSString stringWithFormat:@"whatsapp://send?text=%@", text]];
     if ([[UIApplication sharedApplication] canOpenURL: whatsappURL]) {
         [[UIApplication sharedApplication] openURL: whatsappURL];
     }
@@ -51,31 +48,6 @@ static NSString * const ARGUMENT_KEY_WEBPAGEURL = @"webpageUrl";
     UIDocumentInteractionController * documentInteractionController = [UIDocumentInteractionController interactionControllerWithURL:imageUrl];
     documentInteractionController.UTI = @"net.whatsapp.image";
     [documentInteractionController presentOpenInMenuFromRect:CGRectZero inView:topViewController.view animated: YES];
-    result(nil);
-}
-
-- (void) shareWebpage:(FlutterMethodCall*)call result:(FlutterResult)result {
-    UIViewController * topViewController = [[[[UIApplication sharedApplication] delegate] window] rootViewController];
-    while (topViewController.presentedViewController != nil) {
-        topViewController = topViewController.presentedViewController;
-    }
-    NSString * text = call.arguments[ARGUMENT_KEY_TEXT];
-    NSString * webpageUrl = call.arguments[ARGUMENT_KEY_WEBPAGEURL];
-    webpageUrl = [webpageUrl stringByReplacingOccurrencesOfString:@":" withString:@"%3A"];
-    webpageUrl = [webpageUrl stringByReplacingOccurrencesOfString:@"/" withString:@"%2F"];
-    webpageUrl = [webpageUrl stringByReplacingOccurrencesOfString:@"?" withString:@"%3F"];
-    webpageUrl = [webpageUrl stringByReplacingOccurrencesOfString:@"," withString:@"%2C"];
-    webpageUrl = [webpageUrl stringByReplacingOccurrencesOfString:@"=" withString:@"%3D"];
-    webpageUrl = [webpageUrl stringByReplacingOccurrencesOfString:@"&" withString:@"%26"];
-    NSURL * whatsappURL = nil;
-    if (text != nil && [text length] > 0) {
-        whatsappURL = [NSURL URLWithString:[NSString stringWithFormat:@"whatsapp://send?text=%@%@", [text stringByAddingPercentEncodingWithAllowedCharacters:[NSCharacterSet URLQueryAllowedCharacterSet]], webpageUrl]];
-    } else {
-        whatsappURL = [NSURL URLWithString:[NSString stringWithFormat:@"whatsapp://send?text=%@", webpageUrl]];
-    }
-    if ([[UIApplication sharedApplication] canOpenURL: whatsappURL]) {
-        [[UIApplication sharedApplication] openURL: whatsappURL];
-    }
     result(nil);
 }
 
