@@ -45,9 +45,32 @@ static NSString * const ARGUMENT_KEY_IMAGEURI = @"imageUri";
     }
     NSString * imageUri = call.arguments[ARGUMENT_KEY_IMAGEURI];
     NSURL * imageUrl = [NSURL URLWithString:imageUri];
-    UIDocumentInteractionController * documentInteractionController = [UIDocumentInteractionController interactionControllerWithURL:imageUrl];
-    documentInteractionController.UTI = @"net.whatsapp.image";
-    [documentInteractionController presentOpenInMenuFromRect:CGRectZero inView:topViewController.view animated: YES];
+    NSArray * activityItems = @[imageUrl];
+    UIActivityViewController * activityViewController = [[UIActivityViewController alloc] initWithActivityItems:activityItems applicationActivities:nil];
+    NSMutableArray * excludedActivityTypes = [[NSMutableArray alloc] initWithArray:@[
+                                                                                     UIActivityTypePostToFacebook,
+                                                                                     UIActivityTypePostToTwitter,
+                                                                                     UIActivityTypePostToWeibo,
+                                                                                     UIActivityTypeMessage,
+                                                                                     UIActivityTypeMail,
+                                                                                     UIActivityTypePrint,
+                                                                                     UIActivityTypeCopyToPasteboard,
+                                                                                     UIActivityTypeAssignToContact,
+                                                                                     UIActivityTypeSaveToCameraRoll,
+                                                                                     UIActivityTypeAddToReadingList,
+                                                                                     UIActivityTypePostToFlickr,
+                                                                                     UIActivityTypePostToVimeo,
+                                                                                     UIActivityTypePostToTencentWeibo,
+                                                                                     UIActivityTypeAirDrop
+                                                                                     ]];
+    if (@available(iOS 9.0, *)) {
+        [excludedActivityTypes addObject:UIActivityTypeOpenInIBooks];
+    }
+    if (@available(iOS 11.0, *)) {
+        [excludedActivityTypes addObject:UIActivityTypeMarkupAsPDF];
+    }
+    activityViewController.excludedActivityTypes = excludedActivityTypes;
+    [topViewController presentViewController:activityViewController animated:YES completion:nil];
     result(nil);
 }
 
