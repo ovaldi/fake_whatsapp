@@ -1,3 +1,3 @@
-## 0.0.1
+## 0.0.1 - 2019.5.21
 
-* TODO: Describe initial release.
+* android/ios whatsapp share text/image
