@@ -6,17 +6,13 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ProviderInfo;
-import android.content.pm.ResolveInfo;
 import android.net.Uri;
 import android.os.Build;
-import android.provider.MediaStore;
 import android.text.TextUtils;
 
 import androidx.core.content.FileProvider;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.List;
 
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -76,8 +72,8 @@ public class FakeWhatsappPlugin implements MethodCallHandler {
         sendIntent.setAction(Intent.ACTION_SEND);
         sendIntent.putExtra(Intent.EXTRA_TEXT, text);
         sendIntent.setType("text/*");
-        if (resolveIntent(registrar.context(), sendIntent, WHATSAPP_PACKAGE_NAME)) {
-            sendIntent.setPackage(WHATSAPP_PACKAGE_NAME);
+        sendIntent.setPackage(WHATSAPP_PACKAGE_NAME);
+        if (sendIntent.resolveActivity(registrar.context().getPackageManager()) != null) {
             registrar.activity().startActivity(sendIntent);
         }
         result.success(null);
@@ -98,8 +94,8 @@ public class FakeWhatsappPlugin implements MethodCallHandler {
         sendIntent.putExtra(Intent.EXTRA_STREAM, imageUrl);
         sendIntent.setType("image/*");
         sendIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        if (resolveIntent(registrar.context(), sendIntent, WHATSAPP_PACKAGE_NAME)) {
-            sendIntent.setPackage(WHATSAPP_PACKAGE_NAME);
+        sendIntent.setPackage(WHATSAPP_PACKAGE_NAME);
+        if (sendIntent.resolveActivity(registrar.context().getPackageManager()) != null) {
             registrar.activity().startActivity(sendIntent);
         }
         result.success(null);
@@ -112,8 +108,8 @@ public class FakeWhatsappPlugin implements MethodCallHandler {
         sendIntent.setAction(Intent.ACTION_SEND);
         sendIntent.putExtra(Intent.EXTRA_TEXT, !TextUtils.isEmpty(text) ? text + webpageUrl : webpageUrl);
         sendIntent.setType("text/*");
-        if (resolveIntent(registrar.context(), sendIntent, WHATSAPP_PACKAGE_NAME)) {
-            sendIntent.setPackage(WHATSAPP_PACKAGE_NAME);
+        sendIntent.setPackage(WHATSAPP_PACKAGE_NAME);
+        if (sendIntent.resolveActivity(registrar.context().getPackageManager()) != null) {
             registrar.activity().startActivity(sendIntent);
         }
         result.success(null);
@@ -128,17 +124,5 @@ public class FakeWhatsappPlugin implements MethodCallHandler {
         } catch (PackageManager.NameNotFoundException e) {
         }
         return packageInfo != null;
-    }
-
-    private boolean resolveIntent(Context context, Intent intent, String packageName) {
-        List<ResolveInfo> resolveInfos = context.getPackageManager().queryIntentActivities(intent, 0);
-        if (resolveInfos != null && !resolveInfos.isEmpty()) {
-            for (ResolveInfo resolveInfo : resolveInfos) {
-                if (TextUtils.equals(resolveInfo.activityInfo.packageName, packageName)) {
-                    return true;
-                }
-            }
-        }
-        return false;
     }
 }
